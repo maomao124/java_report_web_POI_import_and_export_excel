@@ -25,8 +25,9 @@ public interface ExcelService
      *
      * @param httpServletRequest  http servlet请求
      * @param httpServletResponse http servlet响应
+     * @param highVersion         是否为高版本
      */
-    void export(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse);
+    void export(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, boolean highVersion);
 
 
     /**

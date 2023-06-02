@@ -1,6 +1,7 @@
 package mao.java_report_web_poi_import_and_export_excel.controller;
 
 import mao.java_report_web_poi_import_and_export_excel.service.ExcelService;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,12 +33,21 @@ public class ExcelController
     private ExcelService excelService;
 
     /**
-     * 导出excel
+     * 导出低版本excel
      */
-    @RequestMapping("/export")
-    public void export(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
+    @RequestMapping("/export/low")
+    public void exportLow(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
     {
-        excelService.export(httpServletRequest, httpServletResponse);
+        excelService.export(httpServletRequest, httpServletResponse, false);
+    }
+
+    /**
+     * 导出高版本excel
+     */
+    @RequestMapping("/export/high")
+    public void exportHigh(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
+    {
+        excelService.export(httpServletRequest, httpServletResponse, true);
     }
 
     /**
@@ -46,6 +56,6 @@ public class ExcelController
     @RequestMapping("/upload")
     public void upload(MultipartFile multipartFile, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
     {
-        excelService.upload(multipartFile,httpServletRequest, httpServletResponse);
+        excelService.upload(multipartFile, httpServletRequest, httpServletResponse);
     }
 }
