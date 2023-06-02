@@ -130,10 +130,134 @@ public class ExcelServiceImpl implements ExcelService
         log.info("导出完成");
     }
 
+    @SneakyThrows
     @Override
     public void upload(MultipartFile multipartFile, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
     {
+        //todo：全局异常处理
+
+        if (multipartFile == null)
+        {
+            throw new RuntimeException("请上传文件");
+        }
+
         log.info("开始导入excel");
-        //todo
+
+        boolean highVersion;
+        //得到文件名
+        String filename = multipartFile.getOriginalFilename();
+        log.info("文件名：" + filename);
+        if (filename == null || filename.length() < 1)
+        {
+            throw new UnsupportedOperationException("无法读取文件名");
+        }
+        if (filename.endsWith(".xlsx"))
+        {
+            highVersion = true;
+        }
+        else if (filename.endsWith(".xls"))
+        {
+            highVersion = false;
+        }
+        else
+        {
+            throw new UnsupportedOperationException("文件后缀名不支持");
+        }
+
+        log.info("高版本？ " + highVersion);
+
+        //加载工作簿
+        Workbook workbook = null;
+        if (highVersion)
+        {
+            workbook = new XSSFWorkbook(multipartFile.getInputStream());
+        }
+        else
+        {
+            workbook = new HSSFWorkbook(multipartFile.getInputStream());
+        }
+        //读取第一个工作表
+        Sheet sheet = workbook.getSheetAt(0);
+        //得到最后一行
+        int lastRowNum = sheet.getLastRowNum();
+        //得到第0行
+        Row row = sheet.getRow(0);
+        //校验表头
+        String stringCellValue = row.getCell(0).getStringCellValue();
+        if (!"班级编号".equals(stringCellValue))
+        {
+            throw new UnsupportedOperationException("表格格式不支持");
+        }
+
+        stringCellValue = row.getCell(1).getStringCellValue();
+        if (!"班级名称".equals(stringCellValue))
+        {
+            throw new UnsupportedOperationException("表格格式不支持");
+        }
+
+        stringCellValue = row.getCell(2).getStringCellValue();
+        if (!"班级人数".equals(stringCellValue))
+        {
+            throw new UnsupportedOperationException("表格格式不支持");
+        }
+
+        stringCellValue = row.getCell(3).getStringCellValue();
+        if (!"所属年级".equals(stringCellValue))
+        {
+            throw new UnsupportedOperationException("表格格式不支持");
+        }
+
+        stringCellValue = row.getCell(4).getStringCellValue();
+        if (!"所属学院".equals(stringCellValue))
+        {
+            throw new UnsupportedOperationException("表格格式不支持");
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("班级编号\t\t班级名称\t\t班级人数\t\t所属年级\t\t所属学院\n");
+
+        //遍历读取数据
+        for (int i = 1; i <= lastRowNum; i++)
+        {
+            //读取第i行
+            row = sheet.getRow(i);
+            //读取班级编号
+            int classNo = ((Double) row.getCell(0).getNumericCellValue()).intValue();
+            String className = null;
+            try
+            {
+                //读取班级名称
+                className = String.valueOf(((Double) row.getCell(1).getNumericCellValue()).intValue());
+            }
+            catch (IllegalStateException e)
+            {
+                className = row.getCell(1).getStringCellValue();
+            }
+            //读取班级人数
+            int classCount = 0;
+            try
+            {
+                classCount = ((Double) row.getCell(2).getNumericCellValue()).intValue();
+            }
+            catch (IllegalStateException e)
+            {
+                classCount = Integer.parseInt(row.getCell(2).getStringCellValue());
+            }
+            //读取所属年级
+            int grade = ((Double) row.getCell(3).getNumericCellValue()).intValue();
+            //读取所属学院
+            String academy = row.getCell(4).getStringCellValue();
+            stringBuilder.append(classNo).append("\t\t")
+                    .append(className).append("\t\t")
+                    .append(classCount).append("\t\t")
+                    .append(grade).append("\t\t")
+                    .append(academy)
+                    .append('\n');
+        }
+
+        log.info("\n\n" + stringBuilder + "\t\t");
+
+        log.info("导入完成");
     }
 }

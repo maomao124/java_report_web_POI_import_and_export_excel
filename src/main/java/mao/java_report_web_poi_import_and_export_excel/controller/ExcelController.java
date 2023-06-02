@@ -1,8 +1,10 @@
 package mao.java_report_web_poi_import_and_export_excel.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import mao.java_report_web_poi_import_and_export_excel.service.ExcelService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 
 
+@Slf4j
 @RestController
 @RequestMapping("/excel")
 public class ExcelController
@@ -54,7 +57,7 @@ public class ExcelController
      * 上传excel
      */
     @RequestMapping("/upload")
-    public void upload(MultipartFile multipartFile, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
+    public void upload(@RequestParam("file") MultipartFile multipartFile, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
     {
         excelService.upload(multipartFile, httpServletRequest, httpServletResponse);
     }
